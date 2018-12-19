@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.db import models
-
+from django.core.urlresolvers import reverse
 # Create your models here.
 from django.db import models
 from django.contrib.auth.models import User
@@ -42,6 +42,15 @@ class Entry(models.Model):
 
     def __str__(self):
         return self.title
+
+    def get_absolute_url(self):
+        # 获取当前博客详情页的url
+        return reverse("djprac1:djprac1_detail", kwargs={"blog_id": self.id})  # app名字，详情页
+
+    def increase_visiting(self):
+        #访问量加1
+        self.visiting += 1
+        self.save(update_fields=['visiting'])   #只保存某个字段
 
     class Meta:
         ordering = ['-created_time']
