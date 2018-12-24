@@ -5,6 +5,7 @@ import json
 from . import models
 import markdown,pygments
 from django.core.paginator import Paginator,PageNotAnInteger,EmptyPage
+from django.db.models import F, Q
 # Create your views here.
 
 def make_paginator(objects, page, num=3):
@@ -156,5 +157,41 @@ def detail(request, blog_id):
     return render(request, 'detail.html', locals())
 
 
+def catagory(request,category_id):
+    c = models.Category.objects.get(id=category_id)
+    entries_c = models.Entry.objects.filter(category=c)
+    page = request.GET.get('page', 1)
+    entry_list, paginator = make_paginator(entries_c, page)
+    page_data = pagination_data(paginator, page)
+    entries = entry_list.object_list
+
+    return render(request, 'index.html', locals())
 
 
+def tag(request,tag_id):
+    t = models.Tag.objects.get(id=tag_id)
+    if t.name == "全部":
+        entries_t = models.Entry.objects.all()
+    else:
+        entries_t = models.Entry.objects.filter(tags=t)
+    page = request.GET.get('page', 1)
+    entry_list, paginator = make_paginator(entries_t, page)
+    page_data = pagination_data(paginator, page)
+    entries = entry_list.object_list
+    return render(request, 'index.html', locals())
+
+
+def search(request):
+    keyword = request.GET.get('keyword', None)
+    if not keyword:
+        error_msg = "请输入关键字"
+        return render(request, 'index.html', locals())
+
+    entries_q = models.Entry.objects.filter(Q(title__icontains=keyword)
+                                          | Q(body__icontains=keyword)
+                                          | Q(abstract__icontains=keyword))
+    page = request.GET.get('page', 1)
+    entry_list, paginator = make_paginator(entries_q, page)
+    page_data = pagination_data(paginator, page)
+    entries = entry_list.object_list
+    return render(request, 'index.html', locals())

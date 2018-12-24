@@ -40,4 +40,13 @@
         </div>
     </div>
 
+&nbsp;&nbsp;&nbsp;&nbsp;分类：
+                    {% for category in entry.category.all %}
+                        &nbsp;&nbsp;<a href="{% url 'blog_category' category.id %}">{{ category.name }}</a>
+                    {% endfor %}
+ &nbsp;&nbsp;&nbsp;&nbsp;标签：
+                    {% for tag in entry.tags.all %}
+                        &nbsp;&nbsp;<a href="{% url 'blog_tag' tag.id %}">{{ tag.name }}</a>
+                    {% endfor %}
 {% endblock %}
+
