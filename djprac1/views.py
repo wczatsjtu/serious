@@ -6,6 +6,7 @@ from . import models
 import markdown,pygments
 from django.core.paginator import Paginator,PageNotAnInteger,EmptyPage
 from django.db.models import F, Q
+import time
 # Create your views here.
 
 def make_paginator(objects, page, num=3):
@@ -195,3 +196,22 @@ def search(request):
     page_data = pagination_data(paginator, page)
     entries = entry_list.object_list
     return render(request, 'index.html', locals())
+
+def delete(request):
+    id = request.GET.get('id', None)
+    if not id:
+        data = {"code":"", "msg": "entry id not provided!", "time":int(time.time())}
+        return HttpResponse(json.dumps(data))
+    entry = models.Entry.objects.filter(id=id)
+    if not entry:
+        data = {"code":"", "msg": "entry not found in database", "time":int(time.time())}
+        return HttpResponse(json.dumps(data))
+    else:
+        entry.delete()
+        data = {"code":"", "msg": "entry %s deleted!"%id, "time":int(time.time())}
+        return HttpResponse(json.dumps(data))
+
+
+
+
+
